@@ -1,0 +1,206 @@
+// Pune Civic Portal - data model
+// Database: MySQL 8.x
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  RESIDENT
+  SOCIAL_WORKER
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum ComplaintCategory {
+  GARBAGE
+  WATER_SUPPLY
+  DRAINAGE_SEWAGE
+  ROAD_POTHOLE
+  STREET_LIGHT
+  ELECTRICITY
+  STRAY_ANIMALS
+  ENCROACHMENT
+  PUBLIC_TOILET
+  NOISE_POLLUTION
+  TRAFFIC
+  HEALTH_SANITATION
+  OTHER
+}
+
+enum ComplaintPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ComplaintStatus {
+  SUBMITTED
+  ACKNOWLEDGED
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+  CLOSED
+}
+
+enum NotificationChannel {
+  WHATSAPP
+  EMAIL
+  SMS
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique @db.VarChar(191)
+  mobile       String    @unique @db.VarChar(20)
+  passwordHash String    @db.VarChar(255)
+  role         Role      @default(RESIDENT)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  failedLogins Int       @default(0)
+  lockedUntil  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  resident   Resident?
+  complaints Complaint[]      @relation("ComplaintOwner")
+  events     ComplaintEvent[] @relation("EventActor")
+
+  @@index([role])
+  @@map("users")
+}
+
+/// Resident profile - MODULE 1
+model Resident {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  firstName    String    @db.VarChar(80)
+  lastName     String    @db.VarChar(80)
+  profilePhoto String?   @db.VarChar(512)
+  dateOfBirth  DateTime? @db.Date
+  gender       Gender    @default(PREFER_NOT_TO_SAY)
+  addressLine  String    @db.VarChar(255)
+  locality     String?   @db.VarChar(120)
+  ward         String?   @db.VarChar(120)
+  city         String    @default("Pune") @db.VarChar(80)
+  state        String    @default("Maharashtra") @db.VarChar(80)
+  pincode      String    @db.VarChar(6)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([pincode])
+  @@index([ward])
+  @@map("residents")
+}
+
+/// Grievance - MODULE 2
+model Complaint {
+  id            String            @id @default(cuid())
+  referenceCode String            @unique @db.VarChar(32)
+  residentId    String
+  title         String            @db.VarChar(150)
+  description   String            @db.Text
+  category      ComplaintCategory @default(OTHER)
+  priority      ComplaintPriority @default(MEDIUM)
+  status        ComplaintStatus   @default(SUBMITTED)
+
+  areaAddress   String   @db.VarChar(255)
+  landmark      String?  @db.VarChar(150)
+  ward          String?  @db.VarChar(120)
+  pincode       String   @db.VarChar(6)
+  latitude      Decimal? @db.Decimal(10, 7)
+  longitude     Decimal? @db.Decimal(10, 7)
+  contactNumber String   @db.VarChar(20)
+
+  resolutionNote String?   @db.Text
+  resolvedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  resident      User               @relation("ComplaintOwner", fields: [residentId], references: [id], onDelete: Cascade)
+  photos        ComplaintPhoto[]
+  events        ComplaintEvent[]
+  notifications NotificationLog[]
+
+  @@index([residentId])
+  @@index([status])
+  @@index([category])
+  @@index([pincode])
+  @@index([createdAt])
+  @@map("complaints")
+}
+
+model ComplaintPhoto {
+  id          String   @id @default(cuid())
+  complaintId String
+  url         String   @db.VarChar(512)
+  fileName    String   @db.VarChar(255)
+  mimeType    String   @db.VarChar(100)
+  sizeBytes   Int
+  createdAt   DateTime @default(now())
+
+  complaint Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+
+  @@index([complaintId])
+  @@map("complaint_photos")
+}
+
+/// Immutable audit trail of every status transition / comment.
+model ComplaintEvent {
+  id          String           @id @default(cuid())
+  complaintId String
+  actorId     String?
+  fromStatus  ComplaintStatus?
+  toStatus    ComplaintStatus?
+  note        String?          @db.Text
+  createdAt   DateTime         @default(now())
+
+  complaint Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  actor     User?     @relation("EventActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([complaintId])
+  @@map("complaint_events")
+}
+
+/// Outbound notification ledger - MODULE 3
+model NotificationLog {
+  id          String              @id @default(cuid())
+  complaintId String?
+  channel     NotificationChannel @default(WHATSAPP)
+  provider    String              @db.VarChar(40)
+  recipient   String              @db.VarChar(40)
+  status      NotificationStatus  @default(PENDING)
+  providerRef String?             @db.VarChar(191)
+  payload     String?             @db.Text
+  error       String?             @db.Text
+  attempts    Int                 @default(0)
+  sentAt      DateTime?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  complaint Complaint? @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+
+  @@index([complaintId])
+  @@index([status])
+  @@map("notification_logs")
+}

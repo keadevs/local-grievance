@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next.js
+.next/
+out/
+build/
+next-env.d.ts
+
+# production artefacts
+*.tsbuildinfo
+
+# runtime uploads (served from disk in the default STORAGE_DRIVER=local mode)
+storage/uploads/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+yarn-error.log*
+coverage/

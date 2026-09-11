@@ -1,0 +1,49 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: pcp-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-pune_civic_portal}
+      MYSQL_USER: ${MYSQL_USER:-pune_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pune_pass}
+    command: --default-authentication-plugin=caching_sha2_password --character-set-server=utf8mb4
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-p${MYSQL_ROOT_PASSWORD:-rootpass}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: pcp-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: mysql://${MYSQL_USER:-pune_user}:${MYSQL_PASSWORD:-pune_pass}@mysql:3306/${MYSQL_DATABASE:-pune_civic_portal}
+      STORAGE_LOCAL_DIR: /app/storage/uploads
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads:/app/storage/uploads
+
+volumes:
+  mysql-data:
+  uploads:
