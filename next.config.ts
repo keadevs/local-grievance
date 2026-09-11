@@ -38,7 +38,6 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  output: "standalone",
   agentRules: false,
   serverExternalPackages: ["@prisma/client", "bcryptjs", "pino"],
   experimental: {
