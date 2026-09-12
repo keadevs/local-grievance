@@ -1,0 +1,11 @@
+{
+  "serviceArea": "Serving Pune & Pimpri-Chinchwad wards",
+  "heroTitle": "Your civic complaint, in your social worker's hands within seconds.",
+  "heroDescription": "Potholes, overflowing garbage, broken street lights or no water supply - register once, report in a minute, and let the portal deliver it straight to WhatsApp with photos and a map pin.",
+  "openDashboard": "Open dashboard",
+  "registerResident": "Register as a resident",
+  "fileComplaint": "File a complaint",
+  "steps": ["Register once with your Pune address details", "File a complaint with photos and a pinned location", "Your social worker receives it on WhatsApp instantly", "Follow the status until it is marked resolved"],
+  "features": [{"title":"Resident Registration","body":"Create a verified household profile with your address, ward and PIN code so every complaint is routed to the right area."},{"title":"Grievance Management","body":"Raise complaints with photos, exact map location and a contact number. Track the status from submitted to resolved."},{"title":"Instant WhatsApp Alert","body":"Every new complaint is pushed to the social worker's WhatsApp within seconds - no email, no waiting, no paperwork."}],
+  "footer": "Built for residents of Pune, Maharashtra."
+}

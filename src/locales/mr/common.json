@@ -1,0 +1,18 @@
+{
+  "brand": "पुणे नागरी पोर्टल",
+  "language": "भाषा",
+  "english": "इंग्रजी",
+  "marathi": "मराठी",
+  "hindi": "हिंदी",
+  "signIn": "साइन इन",
+  "register": "नोंदणी",
+  "logout": "साइन आउट",
+  "dashboard": "डॅशबोर्ड",
+  "myComplaints": "माझ्या तक्रारी",
+  "newComplaint": "नवीन तक्रार",
+  "myProfile": "माझे प्रोफाइल",
+  "grievanceConsole": "तक्रार नियंत्रण कक्ष",
+  "toggleNavigation": "नेव्हिगेशन उघडा किंवा बंद करा",
+  "primaryNavigation": "मुख्य नेव्हिगेशन",
+  "mobileNavigation": "मोबाइल नेव्हिगेशन"
+}

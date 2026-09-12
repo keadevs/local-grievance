@@ -1,0 +1,18 @@
+{
+  "brand": "पुणे नागरिक पोर्टल",
+  "language": "भाषा",
+  "english": "अंग्रेज़ी",
+  "marathi": "मराठी",
+  "hindi": "हिंदी",
+  "signIn": "साइन इन",
+  "register": "पंजीकरण",
+  "logout": "साइन आउट",
+  "dashboard": "डैशबोर्ड",
+  "myComplaints": "मेरी शिकायतें",
+  "newComplaint": "नई शिकायत",
+  "myProfile": "मेरी प्रोफ़ाइल",
+  "grievanceConsole": "शिकायत कंसोल",
+  "toggleNavigation": "नेविगेशन खोलें या बंद करें",
+  "primaryNavigation": "मुख्य नेविगेशन",
+  "mobileNavigation": "मोबाइल नेविगेशन"
+}

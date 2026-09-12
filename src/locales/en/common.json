@@ -1,0 +1,18 @@
+{
+  "brand": "Pune Civic Portal",
+  "language": "Language",
+  "english": "English",
+  "marathi": "Marathi",
+  "hindi": "Hindi",
+  "signIn": "Sign in",
+  "register": "Register",
+  "logout": "Sign out",
+  "dashboard": "Dashboard",
+  "myComplaints": "My complaints",
+  "newComplaint": "New complaint",
+  "myProfile": "My profile",
+  "grievanceConsole": "Grievance console",
+  "toggleNavigation": "Toggle navigation",
+  "primaryNavigation": "Primary",
+  "mobileNavigation": "Mobile"
+}

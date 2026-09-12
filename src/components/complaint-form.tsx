@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 
 import { ImageUploader, type UploadedFile } from '@/components/image-uploader';
+import { useTranslations } from '@/components/locale-provider';
 import { Alert, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
 import { CATEGORY_LABELS, COMPLAINT_CATEGORIES, COMPLAINT_PRIORITIES, PUNE_WARDS } from '@/lib/validation';
 import { apiFetch } from '@/lib/utils';
@@ -37,6 +38,7 @@ export function ComplaintForm({ defaults }: Props) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const t = useTranslations('complaints');
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -70,57 +72,55 @@ export function ComplaintForm({ defaults }: Props) {
 
   return (
     <Card>
-      <h1 className="text-2xl font-bold text-slate-900">File a complaint</h1>
-      <p className="mt-1 text-sm text-slate-600">
-        Your complaint is delivered to the assigned social worker on WhatsApp as soon as you submit it.
-      </p>
+      <h1 className="text-2xl font-bold text-slate-900">{t.fileTitle}</h1>
+      <p className="mt-1 text-sm text-slate-600">{t.fileDescription}</p>
 
       <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-6" noValidate>
         {formError && <Alert>{formError}</Alert>}
 
-        <Field label="Complaint title" htmlFor="title" error={errors.title} required>
-          <Input id="title" name="title" required maxLength={150} placeholder="Overflowing garbage bin near the school gate" />
+        <Field label={t.title} htmlFor="title" error={errors.title} required>
+          <Input id="title" name="title" required maxLength={150} placeholder={t.titlePlaceholder} />
         </Field>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Category" htmlFor="category" error={errors.category} required>
+          <Field label={t.category} htmlFor="category" error={errors.category} required>
             <Select id="category" name="category" defaultValue="GARBAGE" required>
               {COMPLAINT_CATEGORIES.map((c) => (
                 <option key={c} value={c}>
-                  {CATEGORY_LABELS[c]}
+                  {t.categoryLabels[c]}
                 </option>
               ))}
             </Select>
           </Field>
-          <Field label="Priority" htmlFor="priority" error={errors.priority}>
+          <Field label={t.priority} htmlFor="priority" error={errors.priority}>
             <Select id="priority" name="priority" defaultValue="MEDIUM">
               {COMPLAINT_PRIORITIES.map((p) => (
                 <option key={p} value={p}>
-                  {p.charAt(0) + p.slice(1).toLowerCase()}
+                  {t.priorityLabels[p]}
                 </option>
               ))}
             </Select>
           </Field>
         </div>
 
-        <Field label="Description" htmlFor="description" error={errors.description} hint="Minimum 20 characters" required>
+        <Field label={t.description} htmlFor="description" error={errors.description} hint={t.descriptionHint} required>
           <Textarea id="description" name="description" rows={5} required maxLength={5000} />
         </Field>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Where is the issue?</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">{t.whereIssue}</h2>
 
-          <Field label="Area address" htmlFor="areaAddress" error={errors.areaAddress} required>
+          <Field label={t.areaAddress} htmlFor="areaAddress" error={errors.areaAddress} required>
             <Textarea id="areaAddress" name="areaAddress" rows={2} defaultValue={defaults.areaAddress} required />
           </Field>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <Field label="Landmark" htmlFor="landmark" error={errors.landmark}>
-              <Input id="landmark" name="landmark" placeholder="Opposite Vanaz Metro" />
+            <Field label={t.landmark} htmlFor="landmark" error={errors.landmark}>
+              <Input id="landmark" name="landmark" placeholder={t.landmarkPlaceholder} />
             </Field>
-            <Field label="Ward office" htmlFor="ward" error={errors.ward}>
+            <Field label={t.ward} htmlFor="ward" error={errors.ward}>
               <Select id="ward" name="ward" defaultValue={defaults.ward}>
-                <option value="">Select ward</option>
+                <option value="">{t.selectWard}</option>
                 {PUNE_WARDS.map((w) => (
                   <option key={w} value={w}>
                     {w}
@@ -133,7 +133,7 @@ export function ComplaintForm({ defaults }: Props) {
             </Field>
           </div>
 
-          <Field label="Pin the exact location" htmlFor="map" error={errors.latitude ?? errors.longitude}>
+          <Field label={t.pinLocation} htmlFor="map" error={errors.latitude ?? errors.longitude}>
             <MapPicker
               latitude={coords.latitude}
               longitude={coords.longitude}
@@ -144,10 +144,10 @@ export function ComplaintForm({ defaults }: Props) {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
-            label="Contact number"
+            label={t.contactNumber}
             htmlFor="contactNumber"
             error={errors.contactNumber}
-            hint="The social worker will call this number"
+            hint={t.contactHint}
             required
           >
             <Input
@@ -158,13 +158,13 @@ export function ComplaintForm({ defaults }: Props) {
               required
             />
           </Field>
-          <Field label="Complaint photos" htmlFor="upload-complaints" error={errors.photos}>
-            <ImageUploader folder="complaints" value={photos} onChange={setPhotos} max={5} label="Add photos" />
+          <Field label={t.photos} htmlFor="upload-complaints" error={errors.photos}>
+            <ImageUploader folder="complaints" value={photos} onChange={setPhotos} max={5} label={t.addPhotos} />
           </Field>
         </div>
 
         <Button type="submit" size="lg" loading={busy}>
-          Submit complaint &amp; notify social worker
+          {t.submit}
         </Button>
       </form>
     </Card>

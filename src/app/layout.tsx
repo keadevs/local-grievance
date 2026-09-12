@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 
+import { LocaleProvider } from '@/components/locale-provider';
 import { PwaRegister } from '@/components/pwa-register';
+import { getLocale } from '@/lib/server-i18n';
 
 import './globals.css';
 
@@ -39,9 +41,11 @@ export const viewport: Viewport = {
   themeColor: '#1b5ff5',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
+
   return (
-    <html lang="en-IN">
+    <html lang={locale === 'mr' ? 'mr-IN' : locale === 'hi' ? 'hi-IN' : 'en-IN'}>
       <body className="min-h-full font-sans">
         <a
           href="#main"
@@ -50,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <PwaRegister />
-        {children}
+        <LocaleProvider initialLocale={locale}>{children}</LocaleProvider>
       </body>
     </html>
   );

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useCallback, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui';
+import { useTranslations } from '@/components/locale-provider';
 import { apiFetch } from '@/lib/utils';
 
 export interface UploadedFile {
@@ -29,13 +30,14 @@ export function ImageUploader({ folder, value, onChange, max = 5, label = 'Uploa
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations('complaints');
 
   const handleFiles = useCallback(
     async (fileList: FileList | null) => {
       if (!fileList?.length) return;
       const remaining = max - value.length;
       if (remaining <= 0) {
-        setError(`You can attach at most ${max} image(s).`);
+        setError(`${t.upload.limit} ${max} image(s).`);
         return;
       }
 
@@ -89,7 +91,7 @@ export function ImageUploader({ folder, value, onChange, max = 5, label = 'Uploa
               <Image src={file.url} alt={file.fileName} fill sizes="96px" className="object-cover" unoptimized />
               <button
                 type="button"
-                aria-label={`Remove ${file.fileName}`}
+                aria-label={`${t.upload.remove} ${file.fileName}`}
                 onClick={() => onChange(value.filter((f) => f.url !== file.url))}
                 className="absolute right-1 top-1 rounded-full bg-slate-900/70 px-1.5 text-xs font-bold text-white"
               >

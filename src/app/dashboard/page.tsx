@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { Badge, Card, EmptyState } from '@/components/ui';
 import { requireSession } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { CATEGORY_LABELS, COMPLAINT_STATUSES, STATUS_LABELS } from '@/lib/validation';
+import { getServerDictionary } from '@/lib/server-i18n';
+import { COMPLAINT_STATUSES, STATUS_LABELS } from '@/lib/validation';
 import { PRIORITY_STYLES, STATUS_STYLES, relativeTime } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -16,6 +17,8 @@ export default async function DashboardPage({
   searchParams: Promise<{ status?: string; page?: string }>;
 }) {
   const session = await requireSession();
+  const t = await getServerDictionary('dashboard');
+  const complaintT = await getServerDictionary('complaints');
   const params = await searchParams;
 
   const status = COMPLAINT_STATUSES.includes(params.status as never) ? (params.status as never) : undefined;
@@ -46,14 +49,14 @@ export default async function DashboardPage({
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">My complaints</h1>
-          <p className="text-sm text-slate-600">Track every grievance you have raised for your area.</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t.title}</h1>
+          <p className="text-sm text-slate-600">{t.description}</p>
         </div>
         <Link
           href="/dashboard/complaints/new"
           className="rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
         >
-          File a new complaint
+          {t.newComplaint}
         </Link>
       </div>
 
@@ -66,12 +69,12 @@ export default async function DashboardPage({
         ))}
       </div>
 
-      <nav aria-label="Filter by status" className="flex flex-wrap gap-2">
+      <nav aria-label={t.filter} className="flex flex-wrap gap-2">
         <Link
           href="/dashboard"
           className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ${!status ? 'bg-slate-900 text-white ring-slate-900' : 'bg-white text-slate-700 ring-slate-300'}`}
         >
-          All
+          {t.all}
         </Link>
         {COMPLAINT_STATUSES.map((s) => (
           <Link
@@ -86,14 +89,14 @@ export default async function DashboardPage({
 
       {complaints.length === 0 ? (
         <EmptyState
-          title="No complaints yet"
-          description="When you report an issue in your area it will appear here, and your social worker is alerted on WhatsApp immediately."
+          title={t.emptyTitle}
+          description={t.emptyDescription}
           action={
             <Link
               href="/dashboard/complaints/new"
               className="rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
             >
-              File your first complaint
+              {t.firstComplaint}
             </Link>
           }
         />
@@ -110,7 +113,7 @@ export default async function DashboardPage({
                     <p className="font-mono text-xs text-slate-500">{complaint.referenceCode}</p>
                     <h2 className="mt-1 truncate text-base font-semibold text-slate-900">{complaint.title}</h2>
                     <p className="mt-1 text-sm text-slate-600">
-                      {CATEGORY_LABELS[complaint.category]} · {complaint.areaAddress} · {complaint.pincode}
+                      {complaintT.categoryLabels[complaint.category]} · {complaint.areaAddress} · {complaint.pincode}
                     </p>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-2">
@@ -119,9 +122,9 @@ export default async function DashboardPage({
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-500">
-                  <span>Raised {relativeTime(complaint.createdAt)}</span>
-                  <span>{complaint._count.photos} photo(s)</span>
-                  {complaint.latitude && <span>Geo-tagged</span>}
+                  <span>{t.raised} {relativeTime(complaint.createdAt)}</span>
+                  <span>{complaint._count.photos} {t.photos}</span>
+                  {complaint.latitude && <span>{t.geoTagged}</span>}
                 </div>
               </Link>
             </li>
@@ -130,7 +133,7 @@ export default async function DashboardPage({
       )}
 
       {totalPages > 1 && (
-        <nav aria-label="Pagination" className="flex items-center justify-center gap-2">
+        <nav aria-label={t.pagination} className="flex items-center justify-center gap-2">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <Link
               key={p}

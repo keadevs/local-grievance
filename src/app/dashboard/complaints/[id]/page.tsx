@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { ComplaintDetail } from '@/components/complaint-detail';
 import { Alert } from '@/components/ui';
 import { requireSession } from '@/lib/auth';
+import { getServerDictionary } from '@/lib/server-i18n';
 import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -16,6 +17,7 @@ export default async function ComplaintPage({
   searchParams: Promise<{ created?: string }>;
 }) {
   const session = await requireSession();
+  const t = await getServerDictionary('complaints');
   const { id } = await params;
   const { created } = await searchParams;
 
@@ -32,12 +34,12 @@ export default async function ComplaintPage({
   return (
     <div className="flex flex-col gap-5">
       <Link href="/dashboard" className="text-sm font-semibold text-brand-700 hover:underline">
-        ← Back to my complaints
+        ← {t.back}
       </Link>
 
       {created && (
         <Alert tone="success">
-          Complaint <strong>{complaint.referenceCode}</strong> submitted. The social worker has been alerted on WhatsApp.
+          Complaint <strong>{complaint.referenceCode}</strong> {t.submitted}
         </Alert>
       )}
 

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 
 import { Button } from '@/components/ui';
+import { useTranslations } from '@/components/locale-provider';
 
 /** Pune city centre (Shivajinagar) — default map focus. */
 const PUNE_CENTER: [number, number] = [18.5204, 73.8567];
@@ -45,11 +46,12 @@ function Recenter({ position }: { position: [number, number] | null }) {
 export default function MapPicker({ latitude, longitude, onChange }: Props) {
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations('complaints');
   const position: [number, number] | null = latitude != null && longitude != null ? [latitude, longitude] : null;
 
   const locate = () => {
     if (!('geolocation' in navigator)) {
-      setError('Your browser does not support location services.');
+      setError(t.map.unsupported);
       return;
     }
     setLocating(true);
@@ -60,7 +62,7 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
         setLocating(false);
       },
       () => {
-        setError('Could not read your location. Tap on the map to drop a pin instead.');
+        setError(t.map.failed);
         setLocating(false);
       },
       { enableHighAccuracy: true, timeout: 10_000, maximumAge: 30_000 },
@@ -71,10 +73,10 @@ export default function MapPicker({ latitude, longitude, onChange }: Props) {
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-3">
         <Button type="button" variant="secondary" size="sm" loading={locating} onClick={locate}>
-          Use my current location
+          {t.map.current}
         </Button>
         <span className="text-xs text-slate-500">
-          {position ? `Pinned at ${position[0].toFixed(5)}, ${position[1].toFixed(5)}` : 'Tap the map to drop a pin'}
+          {position ? `${t.map.pinned} ${position[0].toFixed(5)}, ${position[1].toFixed(5)}` : t.map.tap}
         </span>
       </div>
 

@@ -1,32 +1,14 @@
 import Link from 'next/link';
 
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { getSession } from '@/lib/auth';
+import { getServerDictionary } from '@/lib/server-i18n';
 import { isStaff } from '@/lib/session';
-
-const FEATURES = [
-  {
-    title: 'Resident Registration',
-    body: 'Create a verified household profile with your address, ward and PIN code so every complaint is routed to the right area.',
-  },
-  {
-    title: 'Grievance Management',
-    body: 'Raise complaints with photos, exact map location and a contact number. Track the status from submitted to resolved.',
-  },
-  {
-    title: 'Instant WhatsApp Alert',
-    body: 'Every new complaint is pushed to the social worker’s WhatsApp within seconds — no email, no waiting, no paperwork.',
-  },
-];
-
-const STEPS = [
-  'Register once with your Pune address details',
-  'File a complaint with photos and a pinned location',
-  'Your social worker receives it on WhatsApp instantly',
-  'Follow the status until it is marked resolved',
-];
 
 export default async function HomePage() {
   const session = await getSession();
+  const t = await getServerDictionary('home');
+  const common = await getServerDictionary('common');
   const dashboardHref = session ? (isStaff(session.role) ? '/admin' : '/dashboard') : '/register';
 
   return (
@@ -35,26 +17,21 @@ export default async function HomePage() {
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2 font-bold text-slate-900">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">PC</span>
-            <span className="hidden sm:inline">Pune Civic Portal</span>
+            <span className="hidden sm:inline">{common.brand}</span>
           </Link>
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             {session ? (
-              <Link
-                href={dashboardHref}
-                className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
-              >
-                Go to dashboard
+              <Link href={dashboardHref} className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+                {common.dashboard}
               </Link>
             ) : (
               <>
                 <Link href="/login" className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
-                  Sign in
+                  {common.signIn}
                 </Link>
-                <Link
-                  href="/register"
-                  className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
-                >
-                  Register
+                <Link href="/register" className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+                  {common.register}
                 </Link>
               </>
             )}
@@ -67,37 +44,24 @@ export default async function HomePage() {
           <div className="grid items-center gap-10 lg:grid-cols-2">
             <div>
               <span className="inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 ring-1 ring-brand-200">
-                Serving Pune &amp; Pimpri-Chinchwad wards
+                {t.serviceArea}
               </span>
-              <h1 className="mt-5 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-                Your civic complaint, in your social worker&apos;s hands within seconds.
-              </h1>
-              <p className="mt-5 text-lg leading-relaxed text-slate-600">
-                Potholes, overflowing garbage, broken street lights or no water supply — register once, report in a
-                minute, and let the portal deliver it straight to WhatsApp with photos and a map pin.
-              </p>
+              <h1 className="mt-5 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">{t.heroTitle}</h1>
+              <p className="mt-5 text-lg leading-relaxed text-slate-600">{t.heroDescription}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href={dashboardHref}
-                  className="rounded-lg bg-brand-600 px-6 py-3 text-center text-base font-semibold text-white shadow-sm hover:bg-brand-700"
-                >
-                  {session ? 'Open dashboard' : 'Register as a resident'}
+                <Link href={dashboardHref} className="rounded-lg bg-brand-600 px-6 py-3 text-center text-base font-semibold text-white shadow-sm hover:bg-brand-700">
+                  {session ? t.openDashboard : t.registerResident}
                 </Link>
-                <Link
-                  href="/login"
-                  className="rounded-lg bg-white px-6 py-3 text-center text-base font-semibold text-slate-800 ring-1 ring-slate-300 hover:bg-slate-50"
-                >
-                  File a complaint
+                <Link href="/login" className="rounded-lg bg-white px-6 py-3 text-center text-base font-semibold text-slate-800 ring-1 ring-slate-300 hover:bg-slate-50">
+                  {t.fileComplaint}
                 </Link>
               </div>
             </div>
 
             <ol className="space-y-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-              {STEPS.map((step, index) => (
+              {t.steps.map((step: string, index: number) => (
                 <li key={step} className="flex gap-4">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-bold text-brand-700">
-                    {index + 1}
-                  </span>
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-bold text-brand-700">{index + 1}</span>
                   <p className="pt-1 text-sm text-slate-700">{step}</p>
                 </li>
               ))}
@@ -107,7 +71,7 @@ export default async function HomePage() {
 
         <section className="border-y border-slate-200 bg-white py-14">
           <div className="mx-auto grid max-w-6xl gap-6 px-4 sm:px-6 md:grid-cols-3">
-            {FEATURES.map((feature) => (
+            {t.features.map((feature: { title: string; body: string }) => (
               <div key={feature.title} className="rounded-xl bg-slate-50 p-6 ring-1 ring-slate-200">
                 <h2 className="text-lg font-semibold text-slate-900">{feature.title}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-slate-600">{feature.body}</p>
@@ -119,8 +83,8 @@ export default async function HomePage() {
 
       <footer className="bg-slate-900 py-8 text-slate-300">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>© {new Date().getFullYear()} Pune Civic Portal — a community initiative.</p>
-          <p>Built for residents of Pune, Maharashtra.</p>
+          <p>© {new Date().getFullYear()} Pune Civic Portal - a community initiative.</p>
+          <p>{t.footer}</p>
         </div>
       </footer>
     </div>

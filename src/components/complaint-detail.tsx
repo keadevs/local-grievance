@@ -1,6 +1,7 @@
 import Image from 'next/image';
 
 import { Badge, Card } from '@/components/ui';
+import { getServerDictionary } from '@/lib/server-i18n';
 import { CATEGORY_LABELS, STATUS_LABELS } from '@/lib/validation';
 import { PRIORITY_STYLES, STATUS_STYLES, formatDateTime } from '@/lib/utils';
 
@@ -50,7 +51,8 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-export function ComplaintDetail({ complaint }: { complaint: ComplaintDetailData }) {
+export async function ComplaintDetail({ complaint }: { complaint: ComplaintDetailData }) {
+  const t = await getServerDictionary('complaints');
   const mapUrl =
     complaint.latitude != null && complaint.longitude != null
       ? `https://www.google.com/maps/search/?api=1&query=${complaint.latitude},${complaint.longitude}`
@@ -66,39 +68,39 @@ export function ComplaintDetail({ complaint }: { complaint: ComplaintDetailData 
           </div>
           <div className="flex gap-2">
             <Badge className={STATUS_STYLES[complaint.status]}>{STATUS_LABELS[complaint.status]}</Badge>
-            <Badge className={PRIORITY_STYLES[complaint.priority]}>{complaint.priority}</Badge>
+            <Badge className={PRIORITY_STYLES[complaint.priority]}>{t.priorityLabels[complaint.priority]}</Badge>
           </div>
         </div>
 
         <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-slate-700">{complaint.description}</p>
 
         <dl className="mt-6">
-          <Row label="Category" value={CATEGORY_LABELS[complaint.category]} />
-          <Row label="Area address" value={complaint.areaAddress} />
-          {complaint.landmark && <Row label="Landmark" value={complaint.landmark} />}
-          {complaint.ward && <Row label="Ward office" value={complaint.ward} />}
-          <Row label="PIN code" value={complaint.pincode} />
-          <Row label="Contact number" value={`+91 ${complaint.contactNumber}`} />
+          <Row label={t.detail.category} value={t.categoryLabels[complaint.category]} />
+          <Row label={t.detail.areaAddress} value={complaint.areaAddress} />
+          {complaint.landmark && <Row label={t.detail.landmark} value={complaint.landmark} />}
+          {complaint.ward && <Row label={t.detail.ward} value={complaint.ward} />}
+          <Row label={t.detail.pinCode} value={complaint.pincode} />
+          <Row label={t.detail.contact} value={`+91 ${complaint.contactNumber}`} />
           <Row
             label="Geolocation"
             value={
               mapUrl ? (
                 <a href={mapUrl} target="_blank" rel="noreferrer noopener" className="font-semibold text-brand-700 underline">
-                  {complaint.latitude?.toFixed(5)}, {complaint.longitude?.toFixed(5)} — open in Maps
+                  {complaint.latitude?.toFixed(5)}, {complaint.longitude?.toFixed(5)} - {t.detail.openMaps}
                 </a>
               ) : (
-                'Not provided'
+                t.detail.notProvided
               )
             }
           />
-          <Row label="Submitted" value={`${formatDateTime(complaint.createdAt)} IST`} />
-          {complaint.resolutionNote && <Row label="Latest remark" value={complaint.resolutionNote} />}
+          <Row label={t.detail.submitted} value={`${formatDateTime(complaint.createdAt)} IST`} />
+          {complaint.resolutionNote && <Row label={t.detail.latestRemark} value={complaint.resolutionNote} />}
         </dl>
       </Card>
 
       {complaint.photos.length > 0 && (
         <Card>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Photos</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">{t.detail.photos}</h2>
           <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {complaint.photos.map((photo) => (
               <li key={photo.id} className="relative aspect-square overflow-hidden rounded-lg ring-1 ring-slate-200">
@@ -110,7 +112,7 @@ export function ComplaintDetail({ complaint }: { complaint: ComplaintDetailData 
       )}
 
       <Card>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Activity timeline</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">{t.detail.timeline}</h2>
         <ol className="mt-4 space-y-4">
           {complaint.events.map((event) => (
             <li key={event.id} className="flex gap-3">
