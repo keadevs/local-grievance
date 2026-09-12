@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 import { Badge, Card } from '@/components/ui';
 import { getServerDictionary } from '@/lib/server-i18n';
-import { CATEGORY_LABELS, STATUS_LABELS } from '@/lib/validation';
+import { CATEGORY_LABELS, COMPLAINT_PRIORITIES, STATUS_LABELS } from '@/lib/validation';
 import { PRIORITY_STYLES, STATUS_STYLES, formatDateTime } from '@/lib/utils';
 
 interface Photo {
@@ -26,7 +26,7 @@ export interface ComplaintDetailData {
   title: string;
   description: string;
   category: keyof typeof CATEGORY_LABELS;
-  priority: string;
+  priority: (typeof COMPLAINT_PRIORITIES)[number];
   status: keyof typeof STATUS_LABELS;
   areaAddress: string;
   landmark: string | null;
