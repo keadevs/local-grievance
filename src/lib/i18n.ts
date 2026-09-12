@@ -36,7 +36,7 @@ export function isLocale(value: string | undefined): value is Locale {
   return Boolean(value && LOCALES.includes(value as Locale));
 }
 
-export function getDictionary(locale: Locale, module: Module) {
-  return dictionaries[locale][module];
+export function getDictionary<TModule extends Module>(locale: Locale, module: TModule): (typeof dictionaries.en)[TModule] {
+  return dictionaries[locale][module] as (typeof dictionaries.en)[TModule];
 }
 

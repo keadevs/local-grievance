@@ -7,6 +7,6 @@ export async function getLocale() {
   return isLocale(value) ? value : 'en';
 }
 
-export async function getServerDictionary(module: Module) {
+export async function getServerDictionary<TModule extends Module>(module: TModule) {
   return getDictionary(await getLocale(), module);
 }
